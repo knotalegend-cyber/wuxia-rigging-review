@@ -305,13 +305,23 @@
     <div class="help-content">
       <ol>
         <li>Tap image → fullscreen zoom.</li>
-        <li>Change <b>category</b> via dropdown if classifier got it wrong. Useful categories: <code>head</code>, <code>hair</code>, <code>torso</code>, <code>arm_upper</code>, <code>arm_lower</code>, <code>arm_full</code> (Scenario sometimes gives one piece for the whole shoulder-to-wrist arm), <code>hand</code>, <code>leg_upper</code>, <code>leg_lower</code>, <code>leg_full</code>, <code>foot</code>, <code>eye</code>, <code>mouth</code>, <code>brow</code>.</li>
-        <li>Tap <b class="ok">✓ OK</b> when the sprite + category are correct and this is the canonical pick for its slot.</li>
-        <li>Tap <b class="var">Variant</b> for duplicates (e.g. one of 4 hand-palms). Use the <b>comment</b> field to note which cell it's a duplicate of, or any other detail.</li>
-        <li>Tap <b class="rej">Reject</b> for noise / stray fragments / cells not usable at all.</li>
+        <li><b>Pick a specific slot</b> from the dropdown — match to what we asked for in the prompt:<br>
+          • Eyes: <code>eye_neutral / closed / wide / squint / halflidded</code><br>
+          • Mouths: <code>mouth_closed / slight / wide / smirk / frown / o</code><br>
+          • Brows: <code>brow_neutral / raised / furrowed</code><br>
+          • Hands: <code>hand_L_palm / fist / point</code> and <code>hand_R_*</code><br>
+          • Arms: <code>arm_upper_L/R / arm_lower_L/R</code>, or <code>arm_full_L/R</code> for single-piece shoulder-to-wrist arms (3-pivot)<br>
+          • Legs: <code>leg_upper_L/R / leg_lower_L/R / leg_full_L/R</code><br>
+          • Heads: <code>head_front / head_back</code>; Hair: <code>hair_front / hair_back</code><br>
+          • Generic fallbacks (plain <code>eye</code>, <code>mouth</code>, etc.) still exist if you want to defer the specific slot assignment.
+        </li>
+        <li>Tap <b class="ok">✓ OK</b> when the sprite + specific slot are correct and this is the canonical pick for that slot.</li>
+        <li>Tap <b class="var">Duplicate</b> when Scenario gave us two cells competing for the same slot (e.g. 2 identical left-palms). Approve the cleaner one; mark the other Duplicate. Use the <b>comment field</b> to note which cell wins.</li>
+        <li>Tap <b class="rej">Reject</b> for noise / stray fragments / cells not usable.</li>
+        <li><b>Note: each eye/mouth/brow sprite is its OWN slot</b>, not a duplicate of the others. They're all unique SpriteLibrary entries (variants in the rig-data sense, but distinct assets). Approve each one with its specific slot.</li>
         <li><b>Comment field is always available</b> — use it for anything you'd tell me verbally ("rotate 5° CCW before wiring", "double-check thumb on this one", "crop 4px off the bottom").</li>
-        <li>When done, tap <b>Export JSON</b> (full structured data) or <b>Copy Summary</b> (readable text). Then tap <b>Copy to Chat</b>.</li>
-        <li>Decisions + comments persist on-device — closing and reopening this page keeps your state.</li>
+        <li>When done, tap <b>Export JSON</b> (full structured data) or <b>Copy Summary</b> (readable text). Then <b>Copy to Chat</b>.</li>
+        <li>Decisions + comments persist on-device.</li>
       </ol>
     </div>
   </details>
@@ -320,7 +330,7 @@
     <button data-filter="all" class="active" onclick="setFilter('all', this)">All</button>
     <button data-filter="pending" onclick="setFilter('pending', this)">Pending</button>
     <button data-filter="approved" onclick="setFilter('approved', this)">Approved</button>
-    <button data-filter="variant" onclick="setFilter('variant', this)">Variant</button>
+    <button data-filter="variant" onclick="setFilter('variant', this)">Duplicate</button>
     <button data-filter="reject" onclick="setFilter('reject', this)">Rejected</button>
     <button data-filter="commented" onclick="setFilter('commented', this)">Commented</button>
   </div>
@@ -342,16 +352,47 @@
 </div>
 
 <script>
-// --- Category vocabulary (matches docs/rig-contracts/wuxia_humanoid_v1.json) ---
-const CATEGORIES = [
-  "head", "hair",
-  "torso",
-  "arm_upper", "arm_lower", "arm_full", "hand",
-  "leg_upper", "leg_lower", "leg_full", "foot",
-  "eye", "mouth", "brow",
-  "mouth_or_brow", "face_feature", "face_patch",
-  "unknown", "reject_noise"
+// --- Category vocabulary — grouped for dropdown. Each rig-contract slot is a
+//     discrete category. Generic fallbacks (head / arm / hand / etc.) exist
+//     for when the user isn't ready to commit to a specific slot yet.
+const CATEGORY_GROUPS = [
+  { label: "-- Head & Hair --", items: [
+    "head_front", "head_back", "head",
+    "hair_front", "hair_back", "hair",
+  ]},
+  { label: "-- Body --", items: [
+    "torso",
+  ]},
+  { label: "-- Eyes (5 states) --", items: [
+    "eye_neutral", "eye_closed", "eye_wide", "eye_squint", "eye_halflidded", "eye",
+  ]},
+  { label: "-- Mouths (6 shapes) --", items: [
+    "mouth_closed", "mouth_slight", "mouth_wide", "mouth_smirk", "mouth_frown", "mouth_o", "mouth",
+  ]},
+  { label: "-- Brows (3 variations) --", items: [
+    "brow_neutral", "brow_raised", "brow_furrowed", "brow",
+  ]},
+  { label: "-- Arms --", items: [
+    "arm_upper_L", "arm_upper_R", "arm_lower_L", "arm_lower_R",
+    "arm_full_L", "arm_full_R", "arm_upper", "arm_lower", "arm_full",
+  ]},
+  { label: "-- Hands (3 poses × 2 sides) --", items: [
+    "hand_L_palm", "hand_L_fist", "hand_L_point",
+    "hand_R_palm", "hand_R_fist", "hand_R_point",
+    "hand",
+  ]},
+  { label: "-- Legs --", items: [
+    "leg_upper_L", "leg_upper_R", "leg_lower_L", "leg_lower_R",
+    "leg_full_L", "leg_full_R", "leg_upper", "leg_lower", "leg_full",
+  ]},
+  { label: "-- Feet --", items: [
+    "foot_L", "foot_R", "foot",
+  ]},
+  { label: "-- Other --", items: [
+    "face_feature", "mouth_or_brow", "unknown", "reject_noise",
+  ]},
 ];
+const CATEGORIES = CATEGORY_GROUPS.flatMap(g => g.items);
 
 // --- Sheets catalog — add entries as new characters are added ---
 const SHEETS = [
@@ -474,12 +515,17 @@ function buildCellCard(c) {
 
   const sel = document.createElement("select");
   sel.className = "cat-select";
-  CATEGORIES.forEach(cat => {
-    const opt = document.createElement("option");
-    opt.value = cat;
-    opt.textContent = cat + (cat === c.category ? " (orig)" : "");
-    if (cat === currentCat) opt.selected = true;
-    sel.appendChild(opt);
+  CATEGORY_GROUPS.forEach(group => {
+    const og = document.createElement("optgroup");
+    og.label = group.label;
+    group.items.forEach(cat => {
+      const opt = document.createElement("option");
+      opt.value = cat;
+      opt.textContent = cat + (cat === c.category ? " (orig)" : "");
+      if (cat === currentCat) opt.selected = true;
+      og.appendChild(opt);
+    });
+    sel.appendChild(og);
   });
   sel.onchange = () => {
     const newCat = sel.value;
@@ -491,7 +537,7 @@ function buildCellCard(c) {
   btnRow.className = "btn-row";
   ["approved", "variant", "reject"].forEach(status => {
     const b = document.createElement("button");
-    b.textContent = status === "approved" ? "✓ OK" : status === "variant" ? "Variant" : "Reject";
+    b.textContent = status === "approved" ? "✓ OK" : status === "variant" ? "Duplicate" : "Reject";
     if (d.status === status) b.classList.add("active-" + status);
     b.onclick = () => {
       const newStatus = d.status === status ? "" : status;
