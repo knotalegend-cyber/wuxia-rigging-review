@@ -1,0 +1,411 @@
+{
+  "sheet": "tianzu_m_simple_gi_v4_alpha.png",
+  "face_row_y": [
+    80,
+    300
+  ],
+  "width": 1536,
+  "height": 1024,
+  "cells": [
+    {
+      "cell_id": "f00",
+      "bbox": [
+        46,
+        80,
+        173,
+        248
+      ],
+      "bbox_local": [
+        46,
+        0,
+        173,
+        168
+      ],
+      "area": 14722,
+      "has_marker": false,
+      "category": "mouth_o_ish",
+      "confidence": 0.4,
+      "crop_file": "crops/f00_mouth_o_ish.png"
+    },
+    {
+      "cell_id": "f01",
+      "bbox": [
+        205,
+        80,
+        332,
+        248
+      ],
+      "bbox_local": [
+        205,
+        0,
+        332,
+        168
+      ],
+      "area": 15323,
+      "has_marker": false,
+      "category": "mouth_o_ish",
+      "confidence": 0.4,
+      "crop_file": "crops/f01_mouth_o_ish.png"
+    },
+    {
+      "cell_id": "f02",
+      "bbox": [
+        368,
+        96,
+        449,
+        134
+      ],
+      "bbox_local": [
+        368,
+        16,
+        449,
+        54
+      ],
+      "area": 1696,
+      "has_marker": false,
+      "category": "eye",
+      "confidence": 0.4,
+      "crop_file": "crops/f02_eye.png"
+    },
+    {
+      "cell_id": "f03",
+      "bbox": [
+        481,
+        95,
+        564,
+        116
+      ],
+      "bbox_local": [
+        481,
+        15,
+        564,
+        36
+      ],
+      "area": 486,
+      "has_marker": false,
+      "category": "mouth_or_brow",
+      "confidence": 0.4,
+      "crop_file": "crops/f03_mouth_or_brow.png"
+    },
+    {
+      "cell_id": "f04",
+      "bbox": [
+        490,
+        111,
+        558,
+        133
+      ],
+      "bbox_local": [
+        490,
+        31,
+        558,
+        53
+      ],
+      "area": 543,
+      "has_marker": false,
+      "category": "eye",
+      "confidence": 0.4,
+      "crop_file": "crops/f04_eye.png"
+    },
+    {
+      "cell_id": "f05",
+      "bbox": [
+        597,
+        94,
+        685,
+        135
+      ],
+      "bbox_local": [
+        597,
+        14,
+        685,
+        55
+      ],
+      "area": 1967,
+      "has_marker": false,
+      "category": "eye",
+      "confidence": 0.4,
+      "crop_file": "crops/f05_eye.png"
+    },
+    {
+      "cell_id": "f06",
+      "bbox": [
+        715,
+        97,
+        803,
+        118
+      ],
+      "bbox_local": [
+        715,
+        17,
+        803,
+        38
+      ],
+      "area": 536,
+      "has_marker": false,
+      "category": "mouth_or_brow",
+      "confidence": 0.4,
+      "crop_file": "crops/f06_mouth_or_brow.png"
+    },
+    {
+      "cell_id": "f07",
+      "bbox": [
+        717,
+        113,
+        794,
+        134
+      ],
+      "bbox_local": [
+        717,
+        33,
+        794,
+        54
+      ],
+      "area": 643,
+      "has_marker": false,
+      "category": "mouth_or_brow",
+      "confidence": 0.4,
+      "crop_file": "crops/f07_mouth_or_brow.png"
+    },
+    {
+      "cell_id": "f08",
+      "bbox": [
+        837,
+        98,
+        925,
+        135
+      ],
+      "bbox_local": [
+        837,
+        18,
+        925,
+        55
+      ],
+      "area": 1584,
+      "has_marker": false,
+      "category": "eye",
+      "confidence": 0.4,
+      "crop_file": "crops/f08_eye.png"
+    },
+    {
+      "cell_id": "f09",
+      "bbox": [
+        909,
+        80,
+        1213,
+        289
+      ],
+      "bbox_local": [
+        909,
+        0,
+        1213,
+        209
+      ],
+      "area": 17713,
+      "has_marker": false,
+      "category": "mouth_o_ish",
+      "confidence": 0.4,
+      "crop_file": "crops/f09_mouth_o_ish.png"
+    },
+    {
+      "cell_id": "f10",
+      "bbox": [
+        1242,
+        80,
+        1505,
+        300
+      ],
+      "bbox_local": [
+        1242,
+        0,
+        1505,
+        220
+      ],
+      "area": 27203,
+      "has_marker": false,
+      "category": "mouth_o_ish",
+      "confidence": 0.4,
+      "crop_file": "crops/f10_mouth_o_ish.png"
+    },
+    {
+      "cell_id": "f11",
+      "bbox": [
+        378,
+        195,
+        427,
+        201
+      ],
+      "bbox_local": [
+        378,
+        115,
+        427,
+        121
+      ],
+      "area": 177,
+      "has_marker": false,
+      "category": "mouth_or_brow",
+      "confidence": 0.4,
+      "crop_file": "crops/f11_mouth_or_brow.png"
+    },
+    {
+      "cell_id": "f12",
+      "bbox": [
+        471,
+        193,
+        514,
+        203
+      ],
+      "bbox_local": [
+        471,
+        113,
+        514,
+        123
+      ],
+      "area": 245,
+      "has_marker": false,
+      "category": "mouth_or_brow",
+      "confidence": 0.4,
+      "crop_file": "crops/f12_mouth_or_brow.png"
+    },
+    {
+      "cell_id": "f13",
+      "bbox": [
+        559,
+        185,
+        603,
+        215
+      ],
+      "bbox_local": [
+        559,
+        105,
+        603,
+        135
+      ],
+      "area": 932,
+      "has_marker": false,
+      "category": "mouth_o_ish",
+      "confidence": 0.4,
+      "crop_file": "crops/f13_mouth_o_ish.png"
+    },
+    {
+      "cell_id": "f14",
+      "bbox": [
+        646,
+        193,
+        700,
+        203
+      ],
+      "bbox_local": [
+        646,
+        113,
+        700,
+        123
+      ],
+      "area": 198,
+      "has_marker": false,
+      "category": "mouth_or_brow",
+      "confidence": 0.4,
+      "crop_file": "crops/f14_mouth_or_brow.png"
+    },
+    {
+      "cell_id": "f15",
+      "bbox": [
+        743,
+        193,
+        795,
+        205
+      ],
+      "bbox_local": [
+        743,
+        113,
+        795,
+        125
+      ],
+      "area": 173,
+      "has_marker": false,
+      "category": "mouth_or_brow",
+      "confidence": 0.4,
+      "crop_file": "crops/f15_mouth_or_brow.png"
+    },
+    {
+      "cell_id": "f16",
+      "bbox": [
+        851,
+        191,
+        869,
+        209
+      ],
+      "bbox_local": [
+        851,
+        111,
+        869,
+        129
+      ],
+      "area": 196,
+      "has_marker": false,
+      "category": "mouth_o_ish",
+      "confidence": 0.4,
+      "crop_file": "crops/f16_mouth_o_ish.png"
+    },
+    {
+      "cell_id": "f17",
+      "bbox": [
+        396,
+        267,
+        497,
+        280
+      ],
+      "bbox_local": [
+        396,
+        187,
+        497,
+        200
+      ],
+      "area": 559,
+      "has_marker": false,
+      "category": "mouth_or_brow",
+      "confidence": 0.4,
+      "crop_file": "crops/f17_mouth_or_brow.png"
+    },
+    {
+      "cell_id": "f18",
+      "bbox": [
+        532,
+        258,
+        629,
+        282
+      ],
+      "bbox_local": [
+        532,
+        178,
+        629,
+        202
+      ],
+      "area": 618,
+      "has_marker": false,
+      "category": "face_feature",
+      "confidence": 0.4,
+      "crop_file": "crops/f18_face_feature.png"
+    },
+    {
+      "cell_id": "f19",
+      "bbox": [
+        659,
+        259,
+        764,
+        283
+      ],
+      "bbox_local": [
+        659,
+        179,
+        764,
+        203
+      ],
+      "area": 760,
+      "has_marker": false,
+      "category": "face_feature",
+      "confidence": 0.4,
+      "crop_file": "crops/f19_face_feature.png"
+    }
+  ]
+}
