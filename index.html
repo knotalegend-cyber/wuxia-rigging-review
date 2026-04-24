@@ -319,6 +319,11 @@
         <li>Tap <b class="var">Duplicate</b> when Scenario gave us two cells competing for the same slot (e.g. 2 identical left-palms). Approve the cleaner one; mark the other Duplicate. Use the <b>comment field</b> to note which cell wins.</li>
         <li>Tap <b class="rej">Reject</b> for noise / stray fragments / cells not usable.</li>
         <li><b>Note: each eye/mouth/brow sprite is its OWN slot</b>, not a duplicate of the others. They're all unique SpriteLibrary entries (variants in the rig-data sense, but distinct assets). Approve each one with its specific slot.</li>
+        <li><b style="color:var(--accent)">L vs R convention (IMPORTANT):</b> <code>_L</code> = character's own LEFT, <code>_R</code> = character's own RIGHT — actor's POV, NOT screen POV. Since the character faces the camera on the parts sheet, <b>sheet-LEFT = character's RIGHT</b> (and vice versa).<br>
+          • Sheet-left hands/arms → <code>hand_R_*</code> / <code>arm_R_*</code><br>
+          • Sheet-right hands/arms → <code>hand_L_*</code> / <code>arm_L_*</code><br>
+          • Palm-pose handedness sanity check: thumb on sprite-right → <code>hand_L</code>; thumb on sprite-left → <code>hand_R</code>.
+        </li>
         <li><b>Comment field is always available</b> — use it for anything you'd tell me verbally ("rotate 5° CCW before wiring", "double-check thumb on this one", "crop 4px off the bottom").</li>
         <li>When done, tap <b>Export JSON</b> (full structured data) or <b>Copy Summary</b> (readable text). Then <b>Copy to Chat</b>.</li>
         <li>Decisions + comments persist on-device.</li>
