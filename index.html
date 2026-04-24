@@ -1,0 +1,587 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>WuxiaMMO2D · Rigging Review</title>
+<style>
+  :root {
+    color-scheme: dark;
+    --bg: #17171b;
+    --panel: #23232a;
+    --panel2: #2b2b33;
+    --border: #3a3a44;
+    --text: #eaeaef;
+    --muted: #9d9da6;
+    --accent: #d9b26a;
+    --approved: #5fa14a;
+    --variant: #d9b26a;
+    --reject: #c8504f;
+    --info: #5aa1c8;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; background: var(--bg); color: var(--text); }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+    font-size: 14px;
+    line-height: 1.4;
+    -webkit-tap-highlight-color: transparent;
+    padding-bottom: 160px;
+  }
+  header {
+    position: sticky;
+    top: 0;
+    background: var(--panel);
+    border-bottom: 1px solid var(--border);
+    padding: 10px 14px;
+    z-index: 100;
+  }
+  h1 { margin: 0 0 2px 0; font-size: 15px; font-weight: 600; color: var(--accent); }
+  .char { color: var(--muted); font-size: 12px; }
+  .summary {
+    font-size: 12px;
+    margin-top: 6px;
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+  .summary span { white-space: nowrap; }
+  .summary .k-app { color: var(--approved); }
+  .summary .k-var { color: var(--variant); }
+  .summary .k-rej { color: var(--reject); }
+  .summary .k-undec { color: var(--muted); }
+
+  .filter-bar {
+    display: flex;
+    gap: 6px;
+    margin-top: 6px;
+    flex-wrap: wrap;
+  }
+  .filter-bar button {
+    background: var(--bg);
+    color: var(--text);
+    border: 1px solid var(--border);
+    padding: 4px 10px;
+    border-radius: 4px;
+    font-size: 12px;
+    cursor: pointer;
+  }
+  .filter-bar button.active { background: var(--accent); color: #17171b; border-color: var(--accent); }
+
+  main {
+    padding: 10px;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+    gap: 10px;
+  }
+  @media (max-width: 600px) {
+    main { grid-template-columns: repeat(2, 1fr); gap: 8px; padding: 8px; }
+  }
+
+  .cell {
+    background: var(--panel);
+    border: 2px solid var(--border);
+    border-radius: 8px;
+    padding: 8px;
+    position: relative;
+    transition: border-color 0.15s;
+  }
+  .cell.status-approved { border-color: var(--approved); }
+  .cell.status-variant  { border-color: var(--variant); }
+  .cell.status-reject   { border-color: var(--reject); opacity: 0.55; }
+
+  .cell img {
+    width: 100%;
+    height: 130px;
+    object-fit: contain;
+    background: #1a1a20;
+    border-radius: 4px;
+    display: block;
+    cursor: pointer;
+  }
+  .id-row {
+    font-family: ui-monospace, "SF Mono", Menlo, monospace;
+    font-size: 10px;
+    color: var(--muted);
+    margin: 4px 0 2px;
+    display: flex;
+    justify-content: space-between;
+  }
+  .badge-marker {
+    background: #ff00ff;
+    color: white;
+    padding: 1px 5px;
+    border-radius: 3px;
+    font-weight: 700;
+  }
+  .cat-select {
+    width: 100%;
+    background: var(--panel2);
+    color: var(--text);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 5px;
+    font-size: 12px;
+    margin-bottom: 6px;
+  }
+  .btn-row {
+    display: flex;
+    gap: 4px;
+  }
+  .btn-row button {
+    flex: 1;
+    background: var(--panel2);
+    color: var(--text);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 6px 4px;
+    font-size: 11px;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  .btn-row button.active-approved { background: var(--approved); border-color: var(--approved); color: #0d1a0a; }
+  .btn-row button.active-variant  { background: var(--variant);  border-color: var(--variant);  color: #1a1108; }
+  .btn-row button.active-reject   { background: var(--reject);   border-color: var(--reject);   color: #1f0a0a; }
+
+  .variant-note {
+    width: 100%;
+    background: var(--panel2);
+    color: var(--text);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 4px 6px;
+    font-size: 11px;
+    margin-top: 6px;
+    display: none;
+  }
+  .cell.status-variant .variant-note { display: block; }
+
+  /* Lightbox for tap-to-zoom */
+  .lightbox {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.92);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 999;
+    cursor: pointer;
+  }
+  .lightbox.open { display: flex; }
+  .lightbox img { max-width: 96vw; max-height: 88vh; object-fit: contain; }
+
+  /* Bottom action bar */
+  .action-bar {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: var(--panel);
+    border-top: 1px solid var(--border);
+    padding: 10px;
+    display: flex;
+    gap: 6px;
+    z-index: 90;
+    flex-wrap: wrap;
+  }
+  .action-bar button {
+    flex: 1;
+    min-width: 0;
+    background: var(--bg);
+    color: var(--text);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 10px 6px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  .action-bar button.primary { background: var(--accent); color: #17171b; border-color: var(--accent); }
+
+  details.help {
+    margin: 8px;
+    padding: 6px 12px;
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    font-size: 12px;
+    color: var(--muted);
+  }
+  details.help summary { color: var(--accent); cursor: pointer; }
+  details.help ol { margin: 6px 0 6px 18px; padding: 0; }
+  details.help li { margin: 3px 0; }
+
+  .export-box {
+    font-family: ui-monospace, "SF Mono", Menlo, monospace;
+    font-size: 10px;
+    background: var(--panel2);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 8px;
+    margin: 8px;
+    max-height: 30vh;
+    overflow: auto;
+    white-space: pre;
+    display: none;
+  }
+  .export-box.visible { display: block; }
+
+  .sheet-picker {
+    margin-top: 6px;
+  }
+  .sheet-picker select {
+    width: 100%;
+    background: var(--bg);
+    color: var(--text);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 6px;
+    font-size: 12px;
+  }
+
+  .empty-state {
+    grid-column: 1/-1;
+    padding: 40px;
+    text-align: center;
+    color: var(--muted);
+    font-size: 13px;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Rigging Review</h1>
+  <div class="char" id="char-label">loading…</div>
+  <div class="sheet-picker">
+    <select id="sheet-select" onchange="switchSheet(this.value)"></select>
+  </div>
+  <div class="summary" id="summary"></div>
+  <div class="filter-bar">
+    <button data-filter="all" class="active" onclick="setFilter('all', this)">All</button>
+    <button data-filter="pending" onclick="setFilter('pending', this)">Pending</button>
+    <button data-filter="approved" onclick="setFilter('approved', this)">Approved</button>
+    <button data-filter="variant" onclick="setFilter('variant', this)">Variant</button>
+    <button data-filter="reject" onclick="setFilter('reject', this)">Rejected</button>
+  </div>
+</header>
+
+<details class="help">
+  <summary>How to review</summary>
+  <ol>
+    <li>Tap image to zoom.</li>
+    <li>Change <b>category</b> via dropdown if the classifier got it wrong.</li>
+    <li>Tap <b>APPROVE</b> when the sprite + category are correct and this is the canonical pick.</li>
+    <li>Tap <b>VARIANT</b> for duplicates (e.g. one of 4 hand-palms). Optionally note which cell it's a duplicate of.</li>
+    <li>Tap <b>REJECT</b> for noise / stray fragments / cells not usable at all.</li>
+    <li>When done, tap <b>EXPORT JSON</b> → paste into chat OR tap <b>COPY SUMMARY</b> for a shorter text version.</li>
+    <li>Your decisions persist on-device — closing and reopening this page keeps them.</li>
+  </ol>
+</details>
+
+<main id="grid"><div class="empty-state">Loading sheet…</div></main>
+
+<div class="export-box" id="export-box"></div>
+
+<div class="action-bar">
+  <button onclick="toggleExport('json')">Export JSON</button>
+  <button onclick="toggleExport('summary')">Copy Summary</button>
+  <button class="primary" onclick="copyExport()">Copy to Chat</button>
+  <button onclick="resetCurrent()">Reset</button>
+</div>
+
+<div class="lightbox" id="lightbox" onclick="this.classList.remove('open')">
+  <img id="lightbox-img" alt="">
+</div>
+
+<script>
+// --- Category vocabulary (matches docs/rig-contracts/wuxia_humanoid_v1.json) ---
+const CATEGORIES = [
+  "head", "hair",
+  "torso",
+  "arm_upper", "arm_lower", "hand",
+  "leg_upper", "leg_lower", "foot",
+  "eye", "mouth", "brow",
+  "mouth_or_brow", "face_feature", "face_patch",
+  "unknown", "reject_noise"
+];
+
+// --- Sheets catalog (populated from folder conventions). Add new entries here
+//     when a new character's parts sheet is pushed. ---
+const SHEETS = [
+  { id: "tianzu_m_simple_gi_v4", label: "Tianzu_M · simple_gi v4" }
+];
+
+let currentSheetId = localStorage.getItem("rr_current_sheet") || SHEETS[0].id;
+let manifest = null;
+let decisions = {};
+let currentFilter = "all";
+let exportMode = null;
+
+function storageKey(sheetId) { return "rr_decisions_" + sheetId; }
+
+function loadDecisions(sheetId) {
+  try { return JSON.parse(localStorage.getItem(storageKey(sheetId)) || "{}"); }
+  catch { return {}; }
+}
+
+function saveDecisions() {
+  localStorage.setItem(storageKey(currentSheetId), JSON.stringify(decisions));
+}
+
+async function switchSheet(sheetId) {
+  currentSheetId = sheetId;
+  localStorage.setItem("rr_current_sheet", sheetId);
+  await loadManifest();
+}
+
+async function loadManifest() {
+  document.getElementById("grid").innerHTML = '<div class="empty-state">Loading sheet…</div>';
+  try {
+    const resp = await fetch("./" + currentSheetId + "/manifest.pending.json");
+    if (!resp.ok) throw new Error("not found");
+    manifest = await resp.json();
+  } catch (e) {
+    document.getElementById("grid").innerHTML = '<div class="empty-state">Could not load manifest for ' + currentSheetId + '</div>';
+    return;
+  }
+  decisions = loadDecisions(currentSheetId);
+  document.getElementById("char-label").textContent =
+    manifest.sheet + " · " + manifest.cells.length + " components";
+  renderGrid();
+  updateSummary();
+  buildSheetDropdown();
+}
+
+function buildSheetDropdown() {
+  const sel = document.getElementById("sheet-select");
+  sel.innerHTML = "";
+  SHEETS.forEach(s => {
+    const opt = document.createElement("option");
+    opt.value = s.id;
+    opt.textContent = s.label;
+    if (s.id === currentSheetId) opt.selected = true;
+    sel.appendChild(opt);
+  });
+}
+
+function getDecision(cellId) {
+  return decisions[cellId] || { status: "", category: null, note: "" };
+}
+
+function setDecision(cellId, patch) {
+  const d = getDecision(cellId);
+  decisions[cellId] = { ...d, ...patch };
+  if (!decisions[cellId].status && !decisions[cellId].category && !decisions[cellId].note) {
+    delete decisions[cellId];
+  }
+  saveDecisions();
+  updateSummary();
+}
+
+function renderGrid() {
+  const grid = document.getElementById("grid");
+  grid.innerHTML = "";
+  const shown = manifest.cells.filter(c => filterMatch(c));
+  if (!shown.length) {
+    grid.innerHTML = '<div class="empty-state">No cells match this filter.</div>';
+    return;
+  }
+  shown.forEach(c => grid.appendChild(buildCellCard(c)));
+}
+
+function filterMatch(c) {
+  const d = getDecision(c.cell_id);
+  const status = d.status || "pending";
+  if (currentFilter === "all") return true;
+  return status === currentFilter;
+}
+
+function setFilter(f, btn) {
+  currentFilter = f;
+  document.querySelectorAll(".filter-bar button").forEach(b => b.classList.remove("active"));
+  btn.classList.add("active");
+  renderGrid();
+}
+
+function buildCellCard(c) {
+  const d = getDecision(c.cell_id);
+  const currentCat = d.category || c.category;
+
+  const el = document.createElement("div");
+  el.className = "cell" + (d.status ? " status-" + d.status : "");
+
+  const img = document.createElement("img");
+  img.src = "./" + currentSheetId + "/" + c.crop_file;
+  img.alt = c.cell_id;
+  img.onclick = () => openLightbox(img.src);
+  el.appendChild(img);
+
+  const idRow = document.createElement("div");
+  idRow.className = "id-row";
+  idRow.innerHTML = `<span>${c.cell_id} · ${c.area}px</span>` + (c.has_marker ? '<span class="badge-marker">M</span>' : '');
+  el.appendChild(idRow);
+
+  const sel = document.createElement("select");
+  sel.className = "cat-select";
+  CATEGORIES.forEach(cat => {
+    const opt = document.createElement("option");
+    opt.value = cat;
+    opt.textContent = cat + (cat === c.category ? " (orig)" : "");
+    if (cat === currentCat) opt.selected = true;
+    sel.appendChild(opt);
+  });
+  sel.onchange = () => {
+    const newCat = sel.value;
+    setDecision(c.cell_id, { category: newCat === c.category ? null : newCat });
+  };
+  el.appendChild(sel);
+
+  const btnRow = document.createElement("div");
+  btnRow.className = "btn-row";
+  ["approved", "variant", "reject"].forEach(status => {
+    const b = document.createElement("button");
+    b.textContent = status === "approved" ? "✓ OK" : status === "variant" ? "Variant" : "Reject";
+    if (d.status === status) b.classList.add("active-" + status);
+    b.onclick = () => {
+      const newStatus = d.status === status ? "" : status;
+      setDecision(c.cell_id, { status: newStatus });
+      renderGrid();
+    };
+    btnRow.appendChild(b);
+  });
+  el.appendChild(btnRow);
+
+  const note = document.createElement("input");
+  note.type = "text";
+  note.className = "variant-note";
+  note.placeholder = "duplicate of? (e.g. c15)";
+  note.value = d.note || "";
+  note.oninput = () => setDecision(c.cell_id, { note: note.value });
+  el.appendChild(note);
+
+  return el;
+}
+
+function updateSummary() {
+  const counts = { approved: 0, variant: 0, reject: 0, pending: 0 };
+  const total = manifest ? manifest.cells.length : 0;
+  if (manifest) {
+    manifest.cells.forEach(c => {
+      const d = getDecision(c.cell_id);
+      const s = d.status || "pending";
+      counts[s]++;
+    });
+  }
+  document.getElementById("summary").innerHTML =
+    `<span class="k-app">✓ ${counts.approved}</span>` +
+    `<span class="k-var">◇ ${counts.variant}</span>` +
+    `<span class="k-rej">✗ ${counts.reject}</span>` +
+    `<span class="k-undec">… ${counts.pending} pending</span>` +
+    `<span class="k-undec">/ ${total}</span>`;
+}
+
+function openLightbox(src) {
+  document.getElementById("lightbox-img").src = src;
+  document.getElementById("lightbox").classList.add("open");
+}
+
+function buildExportJson() {
+  const out = {
+    sheet: manifest.sheet,
+    sheet_id: currentSheetId,
+    total_cells: manifest.cells.length,
+    decisions: manifest.cells.map(c => {
+      const d = getDecision(c.cell_id);
+      return {
+        cell_id: c.cell_id,
+        bbox: c.bbox,
+        area: c.area,
+        has_marker: c.has_marker,
+        category_original: c.category,
+        category: d.category || c.category,
+        status: d.status || "pending",
+        note: d.note || ""
+      };
+    })
+  };
+  return JSON.stringify(out, null, 2);
+}
+
+function buildExportSummary() {
+  if (!manifest) return "";
+  const groups = { approved: {}, variant: {}, reject: [] };
+  manifest.cells.forEach(c => {
+    const d = getDecision(c.cell_id);
+    const cat = d.category || c.category;
+    const status = d.status;
+    if (status === "approved") {
+      (groups.approved[cat] = groups.approved[cat] || []).push(c.cell_id);
+    } else if (status === "variant") {
+      (groups.variant[cat] = groups.variant[cat] || []).push(c.cell_id + (d.note ? " (dup of " + d.note + ")" : ""));
+    } else if (status === "reject") {
+      groups.reject.push(c.cell_id);
+    }
+  });
+  const lines = [manifest.sheet + " — " + manifest.cells.length + " cells"];
+  lines.push("\nAPPROVED:");
+  Object.keys(groups.approved).sort().forEach(cat => {
+    lines.push("  " + cat + ": " + groups.approved[cat].join(", "));
+  });
+  if (Object.keys(groups.variant).length) {
+    lines.push("\nVARIANT (duplicates):");
+    Object.keys(groups.variant).sort().forEach(cat => {
+      lines.push("  " + cat + ": " + groups.variant[cat].join(", "));
+    });
+  }
+  if (groups.reject.length) {
+    lines.push("\nREJECT: " + groups.reject.join(", "));
+  }
+  const pending = manifest.cells.filter(c => !getDecision(c.cell_id).status);
+  if (pending.length) {
+    lines.push("\nPENDING: " + pending.map(c => c.cell_id).join(", "));
+  }
+  return lines.join("\n");
+}
+
+function toggleExport(mode) {
+  const box = document.getElementById("export-box");
+  if (exportMode === mode && box.classList.contains("visible")) {
+    box.classList.remove("visible");
+    exportMode = null;
+    return;
+  }
+  exportMode = mode;
+  box.textContent = mode === "json" ? buildExportJson() : buildExportSummary();
+  box.classList.add("visible");
+}
+
+async function copyExport() {
+  const text = exportMode === "json" ? buildExportJson() : buildExportSummary();
+  try {
+    await navigator.clipboard.writeText(text);
+    alert("Copied! Paste into chat.");
+  } catch {
+    // iOS Safari sometimes blocks clipboard-api — fallback: select + alert
+    const box = document.getElementById("export-box");
+    const range = document.createRange();
+    range.selectNodeContents(box);
+    const sel = getSelection();
+    sel.removeAllRanges();
+    sel.addRange(range);
+    alert("Long-press text area and copy manually.");
+  }
+}
+
+function resetCurrent() {
+  if (!confirm("Clear all decisions for " + currentSheetId + "?")) return;
+  decisions = {};
+  localStorage.removeItem(storageKey(currentSheetId));
+  renderGrid();
+  updateSummary();
+}
+
+loadManifest();
+</script>
+</body>
+</html>
